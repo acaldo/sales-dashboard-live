@@ -7,11 +7,8 @@ WORKDIR /app
 # Copy the requirements file into the container at /app
 COPY requirements.txt /app/
 
-# Create a virtual environment
-RUN python -m venv streamlit
-
-# Activate the virtual environment and install packages
-RUN /app/streamlit/bin/pip install --no-cache-dir -r requirements.txt
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the current directory contents into the container at /app
 COPY . /app/
@@ -20,4 +17,4 @@ COPY . /app/
 EXPOSE 8501
 
 # Define the command to run the app when the container starts
-CMD ["/app/streamlit/bin/python", "-m", "streamlit.cli", "run", "streamlit_app.py"]
+CMD ["streamlit", "run", "streamlit_app.py"]
