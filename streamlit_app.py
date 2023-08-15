@@ -74,7 +74,7 @@ average_sale_by_transaction= round(df_selection['Total'].mean(),2)
 left_column, middle_column, right_column = st.columns(3)
 with left_column:
     st.subheader('Total Sales:')
-    st.subheader(f'US $ {total_sales:,}')
+    st.subheader(f'US $ {total_sales}')
 with middle_column:
     st.subheader('Average Rating:')
     st.subheader(f'{average_rating} {star_rating}')
@@ -87,9 +87,16 @@ st.markdown('---')
 
 ## Sales BY PRODUCT LINE (Bar chart)
 
-sales_by_product_line = (
-    df_selection.groupby(by=['Product line']).sum()[['Total']].sort_values(by='Total')
-)
+
+# Convert 'Total' column to numerical values if needed
+df_selection['Total'] = pd.to_numeric(df_selection['Total'], errors='coerce')
+
+# Group by 'Product line' and sum the 'Total' column
+sales_by_product_line = df_selection.groupby(by=['Product line'])['Total'].sum().reset_index()
+
+# Sort the results by the summed 'Total' column
+sales_by_product_line = sales_by_product_line.sort_values(by='Total')
+
 fig_product_sales = px.bar(
     sales_by_product_line,
     x='Total',
@@ -105,8 +112,14 @@ fig_product_sales.update_layout(
 )
 
 
+
+
 ## Sales by hour (bar chart)
-sales_by_hour = df_selection.groupby(by=['hour']).sum()[['Total']]
+
+# Group by 'Product line' and sum the 'Total' column
+sales_by_hour = df_selection.groupby(by=['hour'])['Total'].sum()
+
+
 fig_hourly_sales = px.bar(
     sales_by_hour,
     x=sales_by_hour.index,
@@ -122,9 +135,13 @@ fig_hourly_sales.update_layout(
     yaxis=(dict(showgrid=False)),
 )
 
+
+
+
 left_column, right_column = st.columns(2)
 left_column.plotly_chart(fig_hourly_sales,use_container_width=True)
 right_column.plotly_chart(fig_product_sales,use_container_width=True)
+
 
 # Hide steramlit style
 hide_st_style = """
